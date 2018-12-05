@@ -5,15 +5,15 @@ if ($env:APPVEYOR)
     $ModuleName = $env:APPVEYOR_PROJECT_NAME
     $Version = $env:APPVEYOR_BUILD_VERSION   
     $TestExit = $true
-    $ModulePath = Join-Path $ProjectPath $ModuleName
 }
 else
 {
     $ModuleName = Split-Path $ProjectPath -Leaf
     $Version = '0.1.0'
     $TestExit = $false
-    $ModulePath = $ProjectPath
 }
+
+$ModulePath = $ProjectPath
 
 # Update manifest with version number
 $ManifestPath = Join-Path $ModulePath "$ModuleName.psd1"
