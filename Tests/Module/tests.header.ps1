@@ -9,5 +9,3 @@ Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'Tools\TestHe
     During unit testing, this variable is not created, so it needs to be created before
     the unit tests can run successfully.
 #>
-[System.Collections.ArrayList] $global:stigSettings = @()
-$global:StigRuleGlobal = @{ID = 'V-1000'}

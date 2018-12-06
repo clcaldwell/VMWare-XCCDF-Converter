@@ -1,25 +1,27 @@
-function Get-Setting {
-[CmdletBinding()]
-Param( [String]$InputLine )
-    $Setting = Switch -regex ( $InputLine ) {
-        "If the `"?(\w*\.\w*)+`"? (setting|keyword) is (not)? set to (\w+)|(`"\w+`")|(`"[\w`= ]+`")|(`".+`")" {
-            $( $Matches[0] -Replace "If the `"?(\w*\.\w*)+`"? (setting|keyword) is (not)? set to ","" ) 
-       }
-       "verify it is set to (`"?\w*`"?)" {
-           $( $Matches[0] -Replace "verify it is set to ","" )
-       }
-        default { $Null }
-    }
+﻿function Get-Setting {
 
-    If ( $Setting -match "`".*`"" ) {
-        $Setting = $Setting -Replace """",""
-    }
+    [CmdletBinding()]
+    Param( [String]$InputLine )
 
-    $Setting
+        $Setting = Switch -regex ( $InputLine ) {
+            "If the `"?(\w*\.\w*)+`"? (setting|keyword) is (not)? set to (\w+)|(`"\w+`")|(`"[\w`= ]+`")|(`".+`")" {
+                $( $Matches[0] -Replace "If the `"?(\w*\.\w*)+`"? (setting|keyword) is (not)? set to ","" )
+            }
+            "verify it is set to (`"?\w*`"?)" {
+                $( $Matches[0] -Replace "verify it is set to ","" )
+            }
+            default { $Null }
+        }
+
+        If ( $Setting -match "`".*`"" ) {
+            $Setting = $Setting -Replace """",""
+        }
+
+        $Setting
 }
 
 function Convert-ESXSTIGToPOSH {
-    
+
     [CmdletBinding()]
     PARAM(
         # _Manual-xccdf.xml file path
@@ -37,7 +39,7 @@ function Convert-ESXSTIGToPOSH {
 
     BEGIN {
         # Load the content as XML
-        try { 
+        try {
             [xml]$VMStig = Get-Content -Path $xccdf -EA Stop
         }
         catch {
@@ -46,13 +48,13 @@ function Convert-ESXSTIGToPOSH {
         }
 
     }# close BEGIN
-    
+
     #region Process Registry Fixes
     PROCESS {
 
         ## loop through the xccdf benchmark collecting data into an object collection
         foreach ($Group in $VMStig.Benchmark.Group) {
-            
+
             $ValueCommand = $Null
             $Value = $Null
             $Setting = $Null
@@ -71,14 +73,14 @@ function Convert-ESXSTIGToPOSH {
         $Lines = $Lines | Where-Object { !( [String]::IsNullOrWhiteSpace($_) ) }
 
         ForEach ( $Line in $Lines ) {
-        
-            
-            If  ( $ValueCommand -eq $Null ) {
+
+
+            If  ( $Null -eq $ValueCommand ) {
                 if ( $Line -match "Get-AdvancedSetting -Name (\w*\.\w*)+" ) {
                     $ValueCommand = $Matches[0]
                 }
             }
-            Write-Verbose "ValueCommand: $ValueCommand"   
+            Write-Verbose "ValueCommand: $ValueCommand"
 
             If ( $ValueCommand ) {
                 If ( $ValueCommand -match "(\w*\.\w*)+" ) {
@@ -87,16 +89,16 @@ function Convert-ESXSTIGToPOSH {
             }
             Write-Verbose "Value: $Value"
 
-            If ( $Setting -eq $Null ) {
+            If ( $Null -eq $Setting ) {
                 $Setting = Get-Setting -InputLine $Line
             }
-            Write-Verbose "Setting: $Setting"   
-        
+            Write-Verbose "Setting: $Setting"
+
         }
-            
+
 
         If ( ($ValueCommand) -and ($Value) -and ($Setting) ) {
-            
+
             $FinalPath = $outPath + "\Automated\"  + $STIG.RuleID + ".ps1"
 
 $HereString = @"
@@ -114,7 +116,7 @@ Switch ( `$Value -eq `"${Setting}`" ) {
 "@
 
         } Else {
-         
+
             $FinalPath = $outPath + "\Manual\"  + $STIG.RuleID + ".ps1"
 
 $HereString = @"
@@ -142,6 +144,5 @@ $($STIG.Check)
             } # End Foreach
 
         } # End Process
-    
+
 } # End Convert-ESXSTIGToPOSH
-    

@@ -1,9 +1,9 @@
-$ProjectPath = Split-Path $PSScriptRoot
+﻿$ProjectPath = Split-Path $PSScriptRoot
 
 if ($env:APPVEYOR)
 {
     $ModuleName = $env:APPVEYOR_PROJECT_NAME
-    $Version = $env:APPVEYOR_BUILD_VERSION   
+    $Version = $env:APPVEYOR_BUILD_VERSION
     $TestExit = $true
 }
 else
@@ -33,5 +33,5 @@ Invoke-Pester -EnableExit:$TestExit -PesterOption @{IncludeVSCodeMarker = $true}
 
 # Run Script Analyzer tests
 $AnalyzerScripts = Get-ChildItem -Filter *.ps* -Recurse | Where-Object { $_.Directory -NotLike "*\Data\*" }
-$AnalyzerScripts | ForEach { Invoke-ScriptAnalyzer -Path $PSItem.FullName -EnableExit }
+$AnalyzerScripts | ForEach-Object { Invoke-ScriptAnalyzer -Path $PSItem.FullName -EnableExit:$TestExit }
 

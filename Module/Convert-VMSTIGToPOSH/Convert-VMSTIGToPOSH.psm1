@@ -1,5 +1,5 @@
-function New-VMPowershellScanFiles {
-    
+﻿function New-VMPowershellScanFiles {
+
     [CmdletBinding()]
     PARAM(
         # _Manual-xccdf.xml file path
@@ -16,7 +16,7 @@ function New-VMPowershellScanFiles {
     )
     BEGIN {
         # Load the content as XML
-        try { 
+        try {
             [xml]$VMStig = Get-Content -Path $xccdf -EA Stop
         }
         catch {
@@ -30,7 +30,7 @@ function New-VMPowershellScanFiles {
 
         ## loop through the xccdf benchmark collecting data into an object collection
         foreach ($Group in $VMStig.Benchmark.Group) {
-            
+
             $ValueCommand = $Null
             $Value = $Null
             $Setting = $Null
@@ -48,11 +48,11 @@ function New-VMPowershellScanFiles {
         $Lines = $($STIG.Check).Split("`n")
 
         ForEach ( $Line in $Lines ) {
-            
-            If  ( $ValueCommand -eq $Null ) {
+
+            If  ( $Null -eq $ValueCommand ) {
                 if ( $Line -match "Get-AdvancedSetting -Name (\.?\w+\.\w+){1,10}" ) {
                     $ValueCommand = $Matches[0]
-                    #default { $null }            
+                    #default { $null }
                 }
             }
 
@@ -62,19 +62,19 @@ function New-VMPowershellScanFiles {
                     #default { $null }
                 }
             }
-            
+
             $Setting = Switch -regex ( $Line ) {
                 "If the virtual machine advanced setting (\.?\w+\.\w+){1,10} does not exist or is not set to true, this is a finding." { '$True' }
                 "If the virtual machine advanced setting (\.?\w+\.\w+){1,10} does not exist or is not set to false, this is a finding." { '$False' }
                 "If the virtual machine advanced setting (\.?\w+\.\w+){1,10} exists, this is a finding." { '$Null' }
                 default { $Null }
             }
-        
+
         }
-            
+
 
         If ( ($ValueCommand) -and ($Value) -and ($Setting) ) {
-            
+
             $FinalPath = $outPath + "\Automated\"  + $STIG.RuleID + ".ps1"
 <#
 $HereString = @"
@@ -101,7 +101,7 @@ $HereString = @"
 "@
 
         } Else {
-         
+
             $FinalPath = $outPath + "\Manual\"  + $STIG.RuleID + ".ps1"
 
 $HereString = @"
@@ -137,6 +137,6 @@ $($STIG.Check)
             } # End Foreach
 
         } # End Process
-    
+
 } # End New-VMPowershellScanFiles
-    
+
