@@ -15,6 +15,7 @@ InModuleScope $ThisModuleName {
                 Get-Setting -InputLine "blahblahblah verify it is set to root" | Should Be "root"
                 Get-Setting -InputLine "blahblahblah verify it is set to root" | Should Be "root"
                 Get-Setting -InputLine "verify it is set to 18 " | Should Be "18"
+                Get-Setting -InputLine "hkjahsdlf hakjsdhflk aksdjhfl ka laks" | Should be $null
             }
         }
 

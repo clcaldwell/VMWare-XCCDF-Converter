@@ -5,8 +5,8 @@ Param( [String]$InputLine )
         "If the `"?(\w*\.\w*)+`"? (setting|keyword) is (not)? set to (\w+)|(`"\w+`")|(`"[\w`= ]+`")|(`".+`")" {
             $( $Matches[0] -Replace "If the `"?(\w*\.\w*)+`"? (setting|keyword) is (not)? set to ","" ) 
        }
-       "verify it is set to (`"?\w*`"?)" { 
-           $( $Matches[0] -Replace "verify it is set to ","" ) 
+       "verify it is set to (`"?\w*`"?)" {
+           $( $Matches[0] -Replace "verify it is set to ","" )
        }
         default { $Null }
     }
@@ -17,6 +17,7 @@ Param( [String]$InputLine )
 
     $Setting
 }
+
 function Convert-ESXSTIGToPOSH {
     
     [CmdletBinding()]
@@ -33,6 +34,7 @@ function Convert-ESXSTIGToPOSH {
         [string]
         $outPath
     )
+
     BEGIN {
         # Load the content as XML
         try { 
@@ -44,6 +46,7 @@ function Convert-ESXSTIGToPOSH {
         }
 
     }# close BEGIN
+    
     #region Process Registry Fixes
     PROCESS {
 

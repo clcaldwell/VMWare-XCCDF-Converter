@@ -28,6 +28,10 @@ $null = New-Item -ItemType Directory -Path $DocsOutPutPath -Force
 $null = New-ExternalHelp -Path $DocsPath -OutPutPath $DocsOutPutPath -Encoding ([System.Text.Encoding]::UTF8) -Force
 #>
 
-# run tests
+# Run Pester tests
 Invoke-Pester -EnableExit:$TestExit -PesterOption @{IncludeVSCodeMarker = $true}
+
+# Run Script Analyzer tests
+$AnalyzerScripts = Get-ChildItem -Filter *.ps* -Recurse | Where-Object { $_.Directory -NotLike "*\Data\*" }
+$AnalyzerScripts | ForEach { Invoke-ScriptAnalyzer -Path $PSItem.FullName -EnableExit }
 
